@@ -15,6 +15,7 @@ request(`https://s3.eu-central-1.amazonaws.com/bersling-ai/data-${dataId}.json`,
   net.trainAsync(trainingData.map(elt => dataMapper.mapPoint(elt)), {})
         .then(res => {
           console.log('finished training');
+          fs.mkdirSync('./models', {recursive: true})
           fs.writeFileSync(`./models/model-${dataId}.json`, JSON.stringify(net.toJSON()));
           console.log('written model to file');
         })
