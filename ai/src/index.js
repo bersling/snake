@@ -6,13 +6,17 @@ const dataId = process.argv[2] || 10;
 
 const dataMapper = require('./data-mapper');
 
-const net = new brain.NeuralNetwork({});
+const net = new brain.NeuralNetwork({
+  hiddenLayers: [10,10]
+});
 
 console.log('started to download the training data');
 request(`https://s3.eu-central-1.amazonaws.com/bersling-ai/data-${dataId}.json`, function (error, response, body) {
   const trainingData = JSON.parse(body);
   console.log('downloaded the training data, starting to train the model');
-  net.trainAsync(trainingData.map(elt => dataMapper.mapPoint(elt)), {})
+  const mappedData = trainingData.map(elt => dataMapper.mapPoint2(elt));
+  fs.writeFileSync(`./mapped-data-${dataId}.json`, JSON.stringify(mappedData));
+  net.trainAsync(mappedData, {})
         .then(res => {
           console.log('finished training');
           fs.mkdirSync('./models', {recursive: true})
